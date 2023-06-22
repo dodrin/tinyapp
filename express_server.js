@@ -18,3 +18,7 @@ app.listen(PORT, () => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
+app.get("/hello", (rew, res) => {
+  res.send("<html><body>Hello <b>world</b></body></html>\n")
+})
