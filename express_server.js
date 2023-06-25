@@ -2,7 +2,14 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 
-//Middleware
+function generateRandomString() {
+  //generate randome a string of 6 random alphanumeric characters
+  //36 represents base 36
+  return Math.random().toString(36).substring(2, 6);
+}
+
+app.use(express.urlencoded({ extended: true }));
+
 //Set ejs as the view engine
 app.set("view engine", "ejs");
 
@@ -29,19 +36,28 @@ app.get("/urls.json", (req, res) => {
 //   res.send("<html><body>Hello <b>world</b></body></html>\n");
 // });
 
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
+// app.get("/set", (req, res) => {
+//   const a = 1;
+//   res.send(`a = ${a}`);
+// });
 
-app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
-});
+// app.get("/fetch", (req, res) => {
+//   res.send(`a = ${a}`);
+// });
 
 //list all the urls
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
+});
+
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -50,3 +66,4 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { id: id, longURL: longURL };
   res.render("urls_show", templateVars);
 });
+
