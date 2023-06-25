@@ -69,3 +69,10 @@ app.post("/urls/:id/edit", (req, res) => {
   const id = req.params.id;
   res.redirect("/urls");
 });
+
+//Post request to login
+app.post("/login", (req, res) => {
+  const inputUserName = req.body.username;
+  res.cookie("username", inputUserName);
+  res.redirect("/urls");
+})

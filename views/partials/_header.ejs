@@ -18,5 +18,24 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
+    <form class="form-inline justify-content-end" action="/login" method="POST">
+      <div class="form-group mb-2">
+        <input
+          class="form-control"
+          type="text"
+          name="username"
+          placeholder="Username"
+          style="width: 13em"
+          required
+        />
+        <button
+          type="submit"
+          class="btn btn-outline-dark"
+          style="margin-left: 0.5em"
+        >
+          Login
+        </button>
+      </div>
+    </form>
   </nav>
 </header>
