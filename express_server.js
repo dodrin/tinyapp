@@ -31,7 +31,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-//From client to server 
+//POST request to add a new URL with new short URL
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const id = generateRandomString();
