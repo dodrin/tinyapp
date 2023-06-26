@@ -19,11 +19,8 @@
       </div>
     </div>
 
-
+    <% if(!username){ %>
     <form class="form-inline justify-content-end" action="/login" method="POST">
-      <div style="margin: 0.5em;">
-        Logged in as: <%= username %>!
-      </div>
       <div class="form-group mb-2">
         <input
           class="form-control"
@@ -42,5 +39,17 @@
         </button>
       </div>
     </form>
+    <% } else{ %>
+    <form class="form-inline justify-content-end" action="/logout" method="POST">
+      <div style="margin: 0.5em">Logged in as: <%= username %>!</div>
+      <button
+        type="submit"
+        class="btn btn-outline-dark"
+        style="margin-left: 0.5em"
+      >
+        Logout
+      </button>
+    </form>
+    <% } %>
   </nav>
 </header>

@@ -1,4 +1,4 @@
-const cookieParser = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 const express = require("express");
 const app = express();
 const PORT = 8080;
@@ -9,12 +9,12 @@ function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 }
 
-app.use(cookieParser()); 
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs"); //Set ejs as the view engine
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
+  b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.ca",
 };
 
@@ -51,7 +51,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 //Retrive "id" parameter from url looks up the corresponding longURL in
-//the urlDatabase and then renders the urls_show  
+//the urlDatabase and then renders the urls_show
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
@@ -88,3 +88,9 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
+//Post request to logout
+app.post("/logout", (req, res) => {
+  const inputUserName = req.body.username;
+  res.clearCookie("username");
+  res.redirect("/urls");
+});
