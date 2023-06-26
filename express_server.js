@@ -1,3 +1,4 @@
+const cookieParser = require('cookie-parser')
 const express = require("express");
 const app = express();
 const PORT = 8080;
@@ -8,6 +9,7 @@ function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 }
 
+app.use(cookieParser()); 
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs"); //Set ejs as the view engine
 
@@ -27,7 +29,10 @@ app.get("/urls.json", (req, res) => {
 
 //list all the urls
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"],
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -37,7 +42,7 @@ app.post("/urls", (req, res) => {
   const id = generateRandomString();
   const longURL = req.body.longURL;
   urlDatabase[id] = longURL;
-  res.redirect(`/urls/${id}`);  //It will redirect to get ('/urls/:id')
+  res.redirect(`/urls/${id}`); //It will redirect to get ('/urls/:id')
 });
 
 //New url form request from client to server
@@ -45,10 +50,16 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//Retrive "id" parameter from url looks up the corresponding longURL in
+//the urlDatabase and then renders the urls_show  
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
-  const templateVars = { id: id, longURL: longURL };
+  const templateVars = {
+    id: id,
+    longURL: longURL,
+    username: req.cookies["username"],
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -58,7 +69,7 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-//Delete 
+//Delete
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
@@ -75,4 +86,5 @@ app.post("/login", (req, res) => {
   const inputUserName = req.body.username;
   res.cookie("username", inputUserName);
   res.redirect("/urls");
-})
+});
+
