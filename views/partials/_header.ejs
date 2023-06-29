@@ -20,32 +20,28 @@
     </div>
 
     <% if(!user){ %>
-    <form class="form-inline justify-content-end" action="/login" method="POST">
-      <div class="form-group mb-2">
-        <input
-          class="form-control"
-          type="text"
-          name="user_id"
-          placeholder="User ID"
-          style="width: 13em"
-          required
-        />
-        <button
-          type="submit"
-          class="btn btn-outline-dark"
-          style="margin-left: 0.5em"
-        >
-          Login
-        </button>
-      </div>
+    <form class="form-inline" action="/login" method="GET">
+      <button
+        type="submit"
+        class="btn btn-outline-dark"
+        style="margin-left: 0.5em"
+      >
+        Login
+      </button>
     </form>
+    <form class="form-inline" action="/register" method="GET">
+      <button
+        type="submit"
+        class="btn btn-outline-dark"
+        style="margin-left: 0.5em"
+      >
+        Register
+      </button>
+    </form>
+
     <% } else{ %>
-    <form
-      class="form-inline justify-content-end"
-      action="/logout"
-      method="POST"
-    >
-      <div style="margin: 0.5em">Logged in as: <%= user.email %>!</div>
+    <form class="form-inline" action="/logout" method="POST">
+      <div style="margin-left: 0.5em">Logged in as: <%= user.email %>!</div>
       <button
         type="submit"
         class="btn btn-outline-dark"
@@ -54,6 +50,7 @@
         Logout
       </button>
     </form>
+
     <% } %>
   </nav>
 </header>

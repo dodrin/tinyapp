@@ -11,14 +11,14 @@
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
-    <title>TinyApp - register</title>
+    <title>TinyApp - login</title>
   </head>
   <body>
     <%- include('partials/_header') %>
     <div style="margin: 3em">
-      <h1>Create Account</h1>
+      <h1>Login</h1>
     </div>
-    <form action="/register" method="POST" style="margin: 3em">
+    <form action="/login" method="POST" style="margin: 3em">
       <div class="form-group row">
         <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
         <div class="col-sm-5">
@@ -26,7 +26,7 @@
             class="form-control"
             type="email"
             name="email"
-            placeholder="Enter email"
+            placeholder="email@example.com"
           />
         </div>
       </div>
@@ -43,7 +43,7 @@
           />
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Register</button>
+      <button type="submit" class="btn btn-primary">Login</button>
     </form>
   </body>
 </html>
