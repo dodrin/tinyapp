@@ -19,14 +19,14 @@
       </div>
     </div>
 
-    <% if(!username){ %>
+    <% if(!user){ %>
     <form class="form-inline justify-content-end" action="/login" method="POST">
       <div class="form-group mb-2">
         <input
           class="form-control"
           type="text"
-          name="username"
-          placeholder="Username"
+          name="user_id"
+          placeholder="User ID"
           style="width: 13em"
           required
         />
@@ -40,8 +40,12 @@
       </div>
     </form>
     <% } else{ %>
-    <form class="form-inline justify-content-end" action="/logout" method="POST">
-      <div style="margin: 0.5em">Logged in as: <%= username %>!</div>
+    <form
+      class="form-inline justify-content-end"
+      action="/logout"
+      method="POST"
+    >
+      <div style="margin: 0.5em">Logged in as: <%= user.email %>!</div>
       <button
         type="submit"
         class="btn btn-outline-dark"
