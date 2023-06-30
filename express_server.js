@@ -143,6 +143,10 @@ app.get("/urls/:id", (req, res) => {
   const loginUser = users[loginID];
   const url = urlDatabase[id];
 
+  if (!url) {
+    return res.send("<h2>Short url does not exist.</h2>");
+  }
+
   if (!loginUser) {
     return res
       .status(401)
@@ -155,16 +159,65 @@ app.get("/urls/:id", (req, res) => {
     return res.send("<h2>You do not have permission to access this URL.</h2>");
   }
 
-  if (!url) {
-    return res.send("<h2>Short url does not exist.</h2>");
-  }
-
   const templateVars = {
     id: id,
     longURL: url.longURL,
     user: loginUser,
   };
   res.render("urls_show", templateVars);
+});
+
+//---Delete
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+  const loginID = req.cookies["user_id"];
+  const loginUser = users[loginID];
+  const url = urlDatabase[id];
+
+  if (!url) {
+    return res.send("<h2>Short url does not exist.</h2>");
+  }
+  
+  if (!loginUser) {
+    return res
+      .status(401)
+      .send(
+        "<h2>You must be logged in to TinyApp!</h2><p>Login or register first.</p>"
+      );
+  }
+
+  if (url.userID !== loginID) {
+    return res.send("<h2>You do not have permission to access this URL.</h2>");
+  }
+
+  delete urlDatabase[id];
+  res.redirect("/urls");
+});
+
+//---Edit
+app.post("/urls/:id/edit", (req, res) => {
+  const id = req.params.id;
+  const loginID = req.cookies["user_id"];
+  const loginUser = users[loginID];
+  const url = urlDatabase[id];
+
+  if (!url) {
+    return res.send("<h2>Short url does not exist.</h2>");
+  }
+
+  if (!loginUser) {
+    return res
+      .status(401)
+      .send(
+        "<h2>You must be logged in to TinyApp!</h2><p>Login or register first.</p>"
+      );
+  }
+
+  if (url.userID !== loginID) {
+    return res.send("<h2>You do not have permission to access this URL.</h2>");
+  }
+
+  res.redirect("/urls");
 });
 
 app.get("/u/:id", (req, res) => {
@@ -207,22 +260,6 @@ app.get("/register", (req, res) => {
   } else {
     res.render("urls_register", templateVars);
   }
-});
-
-//---Delete
-app.post("/urls/:id/delete", (req, res) => {
-  const id = req.params.id;
-  delete urlDatabase[id];
-  res.redirect("/urls");
-});
-
-//---Edit
-app.post("/urls/:id/edit", (req, res) => {
-  const id = req.params.id;
-  const templateVars = {
-    user_id: req.cookies["user_id"],
-  };
-  res.redirect("/urls");
 });
 
 //---Login
