@@ -4,12 +4,19 @@ const app = express();
 const PORT = 8080;
 
 //----Helper functions
+/**
+ * @Returns a string of 6 dondom alphanumeric characters
+ */
 function generateRandomString() {
-  //generate randome a string of 6 random alphanumeric characters
   //36 represents base 36
   return Math.random().toString(36).substring(2, 8);
 }
 
+/**
+ * Get user by Email from user database
+ * @param {string} email
+ * @returns user information object if found, otherwise undefined
+ */
 function getUserByEmail(email) {
   for (const user in users) {
     if (users[user].email === email) {
@@ -19,13 +26,16 @@ function getUserByEmail(email) {
   return undefined;
 }
 
+/**
+ * Only shows URLs that belong to the logged-in user from urlDatabase
+ * @param {string} id - the id of the currently logged-in user
+ * @Returns the URLs where the userID is equal to
+ */
 function urlsForUser(id) {
-  //returns the URLs where the userID is equal to
-  //the id of the currently logged-in user.
   const userURLs = {};
-  for (const id in urlDatabase) {
-    if (urlDatabase[id].userID === id) {
-      userURLs[id] = urlDatabase[id];
+  for (const shortUrl in urlDatabase) {
+    if (urlDatabase[shortUrl].userID === id) {
+      userURLs[id] = urlDatabase[shortUrl];
     }
   }
   return userURLs;
@@ -105,7 +115,7 @@ app.get("/urls", (req, res) => {
 //POST request to add a new URL with new short URL
 app.post("/urls", (req, res) => {
   if (!users[req.cookies["user_id"]]) {
-    res.status(401).send("<h2>You must be logged in to TinyApp.</h2>");
+    return res.status(401).send("<h2>You must be logged in to TinyApp.</h2>");
   }
   const id = generateRandomString();
   const longURL = req.body.longURL;
@@ -120,7 +130,7 @@ app.get("/urls/new", (req, res) => {
     user: loginUser,
   };
   if (!loginUser) {
-    res.render("login", templateVars);
+    return res.render("login", templateVars);
   }
   res.render("urls_new", templateVars);
 });
@@ -134,15 +144,19 @@ app.get("/urls/:id", (req, res) => {
   const url = urlDatabase[id];
 
   if (!loginUser) {
-    res
+    return res
       .status(401)
       .send(
         "<h2>You must be logged in to TinyApp!</h2><p>Login or register first.</p>"
       );
   }
 
+  if (url.userID !== loginID) {
+    return res.send("<h2>You do not have permission to access this URL.</h2>");
+  }
+
   if (!url) {
-    res.send("<h2>Short url does not exist.</h2>");
+    return res.send("<h2>Short url does not exist.</h2>");
   }
 
   const templateVars = {
