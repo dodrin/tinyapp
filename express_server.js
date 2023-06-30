@@ -24,8 +24,14 @@ app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs"); //Set ejs as the view engine
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.ca",
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 const users = {
@@ -57,16 +63,23 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     user_id: req.cookies["user_id"],
   };
-  res.render("urls_index", templateVars);
+  if (!users[req.cookies["user_id"]]) {
+    res.status(401).send("<h2>You must be logged in to TinyApp!</h2><p>Login or register first.</p>");
+  } else {
+    res.render("urls_index", templateVars);
+  }
 });
 
 //POST request to add a new URL with new short URL
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  const id = generateRandomString();
-  const longURL = req.body.longURL;
-  // const templateVars = (urlDatabase[id] = longURL);
-  res.redirect(`/urls/${id}`); //It will redirect to get ('/urls/:id')
+  if (!users[req.cookies["user_id"]]) {
+    res.status(401).send("<h2>You must be logged in to TinyApp.</h2>");
+  } else {
+    const id = generateRandomString();
+    const longURL = req.body.longURL;
+    urlDatabase[id] = longURL;
+    res.redirect(`/urls/${id}`);
+  }
 });
 
 //New url form request from client to server
@@ -74,20 +87,27 @@ app.get("/urls/new", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]],
   };
+  if (!users[req.cookies["user_id"]]) {
+    res.render("login", templateVars);
+  }
   res.render("urls_new", templateVars);
 });
 
-//Retrive "id" parameter from url looks up the corresponding longURL in
-//the urlDatabase and then renders the urls_show
+//Retrive "id" parameter from url looks up the corresponding longURL
+//in the urlDatabase and then renders the urls_show
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id];
+  const longURL = urlDatabase[id].longURL;
   const templateVars = {
     id: id,
     longURL: longURL,
     user: users[req.cookies["user_id"]],
   };
-  res.render("urls_show", templateVars);
+  if (!urlDatabase[id]) {
+    res.send("<h2>Short url does not exist.</h2>");
+  } else {
+    res.render("urls_show", templateVars);
+  }
 });
 
 app.get("/u/:id", (req, res) => {
@@ -106,7 +126,7 @@ app.post("/register", (req, res) => {
   if (getUserByEmail(email, users)) {
     return res.status(400).send("Email already exists");
   }
-  //if it passes the above conditions, creates a new ID
+
   const user_id = generateRandomString();
   const newUser = {
     id: user_id,
@@ -124,7 +144,11 @@ app.get("/register", (req, res) => {
     user_id: req.cookies["user_id"],
     user: users[req.cookies["user_id"]],
   };
-  res.render("urls_register", templateVars);
+  if (users[req.cookies["user_id"]]) {
+    res.redirect("/urls");
+  } else {
+    res.render("urls_register", templateVars);
+  }
 });
 
 //Delete
@@ -147,7 +171,11 @@ app.get("/login", (req, res) => {
     user_id: req.cookies["user_id"],
     user: users[req.cookies["user_id"]],
   };
-  res.render("login", templateVars);
+  if (users[req.cookies["user_id"]]) {
+    res.redirect("/urls");
+  } else {
+    res.render("login", templateVars);
+  }
 });
 
 app.post("/login", (req, res) => {
