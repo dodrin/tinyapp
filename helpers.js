@@ -6,10 +6,37 @@
 function getUserByEmail(email, database) {
   for (const user in database) {
     if (database[user].email === email) {
-      return user;
+      return users[user];
     }
   }
   return undefined;
 }
 
-module.exports = { getUserByEmail };
+/**
+ * Only shows URLs that belong to the logged-in user from urlDatabase
+ * @param {string} id - the id of the currently logged-in user
+ * @Returns the URLs where the userID is equal to
+ */
+function urlsForUser(id, urlDatabase) {
+  const userURLs = {};
+  for (const shortUrl in urlDatabase) {
+    if (urlDatabase[shortUrl].userID === id) {
+      userURLs[id] = urlDatabase[shortUrl];
+    }
+  }
+  return userURLs;
+}
+
+/**
+ * @Returns a string of 6 dondom alphanumeric characters
+ */
+function generateRandomString() {
+  //36 represents base 36
+  return Math.random().toString(36).substring(2, 8);
+}
+
+module.exports = {
+  getUserByEmail,
+  urlsForUser,
+  generateRandomString,
+};

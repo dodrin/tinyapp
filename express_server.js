@@ -1,43 +1,24 @@
-const cookieSession = require('cookie-session')
+const cookieSession = require("cookie-session");
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const getUserByEmail = require("./helpers");
+const {
+  getUserByEmail,
+  urlsForUser,
+  generateRandomString,
+} = require("./helpers");
 const app = express();
 const PORT = 8080;
 
-//----Helper functions
-/**
- * @Returns a string of 6 dondom alphanumeric characters
- */
-function generateRandomString() {
-  //36 represents base 36
-  return Math.random().toString(36).substring(2, 8);
-}
-
-
-/**
- * Only shows URLs that belong to the logged-in user from urlDatabase
- * @param {string} id - the id of the currently logged-in user
- * @Returns the URLs where the userID is equal to
- */
-function urlsForUser(id) {
-  const userURLs = {};
-  for (const shortUrl in urlDatabase) {
-    if (urlDatabase[shortUrl].userID === id) {
-      userURLs[id] = urlDatabase[shortUrl];
-    }
-  }
-  return userURLs;
-}
-
 //---Middleware
-app.use(cookieSession({
-  name: 'session',
-  keys: ["secret-key"],
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["secret-key"],
 
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs"); //Set ejs as the view engine
 
@@ -92,7 +73,7 @@ app.get("/urls", (req, res) => {
   const templateVars = {
     user: loginUser,
     urls: urlDatabase,
-    userURLs: urlsForUser(loginID),
+    userURLs: urlsForUser(loginID, urlDatabase),
     user_id: loginID,
   };
   if (!loginUser) {
@@ -102,7 +83,7 @@ app.get("/urls", (req, res) => {
         "<h2>You must be logged in to TinyApp!</h2><p>Login or register first.</p>"
       );
   } else {
-    templateVars.urls = urlsForUser(loginID);
+    templateVars.urls = urlsForUser(loginID, urlDatabase);
     res.render("urls_index", templateVars);
   }
 });
