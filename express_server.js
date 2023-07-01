@@ -47,7 +47,7 @@ function urlsForUser(id) {
 app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
-  keys: [/* secret keys */],
+  keys: ["secret-key"],
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
@@ -123,7 +123,7 @@ app.get("/urls", (req, res) => {
 
 //POST request to add a new URL with new short URL
 app.post("/urls", (req, res) => {
-  if (!users[req.cookies["user_id"]]) {
+  if (!users[req.session.user_id]) {
     return res.status(401).send("<h2>You must be logged in to TinyApp.</h2>");
   }
   const id = generateRandomString();
@@ -133,7 +133,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const loginID = req.cookies["user_id"];
+  const loginID = req.session.user_id;
   const loginUser = users[loginID];
   const templateVars = {
     user: loginUser,
@@ -179,7 +179,7 @@ app.get("/urls/:id", (req, res) => {
 //---Delete
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
-  const loginID = req.cookies["user_id"];
+  const loginID = req.session.user_id;
   const loginUser = users[loginID];
   const url = urlDatabase[id];
 
@@ -206,7 +206,7 @@ app.post("/urls/:id/delete", (req, res) => {
 //---Edit
 app.post("/urls/:id/edit", (req, res) => {
   const id = req.params.id;
-  const loginID = req.cookies["user_id"];
+  const loginID = req.session.user_id;
   const loginUser = users[loginID];
   const url = urlDatabase[id];
 
@@ -262,7 +262,7 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const loginID = req.cookies["user_id"];
+  const loginID = req.session.user_id;
   const loginUser = users[loginID];
 
   const templateVars = {
@@ -278,7 +278,7 @@ app.get("/register", (req, res) => {
 
 //---Login
 app.get("/login", (req, res) => {
-  const loginID = req.cookies["user_id"];
+  const loginID = req.session.user_id;
   const loginUser = users[loginID];
 
   const templateVars = {
