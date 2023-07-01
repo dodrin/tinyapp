@@ -200,9 +200,8 @@ app.post("/urls/:id/edit", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id];
 
-  res.redirect(longURL);
+  res.redirect(urlDatabase[id].longURL);
 });
 
 //email and password cannot be empty, alredy existing email cannot be registered
@@ -231,13 +230,8 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  // const loginID = req.session.user_id;
   const loginUser = users[req.session.user_id];
 
-  // const templateVars = {
-  //   user_id: loginID,
-  //   user: loginUser,
-  // };
   if (loginUser) {
     res.redirect("/urls");
   } else {
@@ -247,13 +241,8 @@ app.get("/register", (req, res) => {
 
 //---Login
 app.get("/login", (req, res) => {
-  // const loginID = req.session.user_id;
   const loginUser = users[req.session.user_id];
 
-  // const templateVars = {
-  //   user_id: loginID,
-  //   user: loginUser,
-  // };
   if (loginUser) {
     res.redirect("/urls");
   } else {
