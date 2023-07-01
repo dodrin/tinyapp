@@ -1,4 +1,5 @@
 const cookieParser = require("cookie-parser");
+const cookieSession = require('cookie-session')
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const app = express();
@@ -44,6 +45,13 @@ function urlsForUser(id) {
 
 //---Middleware
 app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: [/* secret keys */],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs"); //Set ejs as the view engine
 
