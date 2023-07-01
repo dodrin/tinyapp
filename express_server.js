@@ -1,5 +1,6 @@
 const cookieParser = require("cookie-parser");
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 8080;
 
@@ -177,7 +178,7 @@ app.post("/urls/:id/delete", (req, res) => {
   if (!url) {
     return res.send("<h2>Short url does not exist.</h2>");
   }
-  
+
   if (!loginUser) {
     return res
       .status(401)
@@ -234,15 +235,17 @@ app.post("/register", (req, res) => {
   if (!email || !password) {
     return res.status(400).send("Invalid email or/and password");
   }
-  if (getUserByEmail(email, users)) {
+  if (getUserByEmail(email)) {
     return res.status(400).send("Email already exists");
   }
 
   const user_id = generateRandomString();
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
   const newUser = {
     id: user_id,
     email: email,
-    password: password,
+    password: hashedPassword,
   };
   users[user_id] = newUser;
 
@@ -251,11 +254,14 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  const loginID = req.cookies["user_id"];
+  const loginUser = users[loginID];
+
   const templateVars = {
-    user_id: req.cookies["user_id"],
-    user: users[req.cookies["user_id"]],
+    user_id: loginID,
+    user: loginUser,
   };
-  if (users[req.cookies["user_id"]]) {
+  if (loginUser) {
     res.redirect("/urls");
   } else {
     res.render("urls_register", templateVars);
@@ -264,11 +270,14 @@ app.get("/register", (req, res) => {
 
 //---Login
 app.get("/login", (req, res) => {
+  const loginID = req.cookies["user_id"];
+  const loginUser = users[loginID];
+
   const templateVars = {
-    user_id: req.cookies["user_id"],
-    user: users[req.cookies["user_id"]],
+    user_id: loginID,
+    user: loginUser,
   };
-  if (users[req.cookies["user_id"]]) {
+  if (loginUser) {
     res.redirect("/urls");
   } else {
     res.render("login", templateVars);
@@ -283,7 +292,9 @@ app.post("/login", (req, res) => {
     return res.status(403).send("Invalid email/password");
   }
 
-  if (currentUser.password !== password) {
+  const passwordMatch = bcrypt.compareSync(password, currentUser.password);
+
+  if (!passwordMatch) {
     return res.status(403).send("Invalid email/password");
   }
   res.cookie("user_id", currentUser.id);
