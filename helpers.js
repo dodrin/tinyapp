@@ -6,10 +6,10 @@
 function getUserByEmail(email, database) {
   for (const user in database) {
     if (database[user].email === email) {
-      return database[user];
+      return user;
     }
   }
   return undefined;
 }
 
-module.exports = getUserByEmail;
+module.exports = { getUserByEmail };
