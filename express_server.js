@@ -1,4 +1,3 @@
-const cookieParser = require("cookie-parser");
 const cookieSession = require('cookie-session')
 const express = require("express");
 const bcrypt = require("bcryptjs");
@@ -19,7 +18,7 @@ function generateRandomString() {
  * @param {string} email
  * @returns user information object if found, otherwise undefined
  */
-function getUserByEmail(email) {
+function getUserByEmail(email, database) {
   for (const user in users) {
     if (users[user].email === email) {
       return users[user];
@@ -44,7 +43,6 @@ function urlsForUser(id) {
 }
 
 //---Middleware
-app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ["secret-key"],
@@ -101,7 +99,7 @@ app.get("/urls.json", (req, res) => {
 
 //list all the urls
 app.get("/urls", (req, res) => {
-  const loginID = req.cookies["user_id"];
+  const loginID = req.session.user_id;
   const loginUser = users[loginID];
   const templateVars = {
     user: loginUser,
@@ -148,7 +146,7 @@ app.get("/urls/new", (req, res) => {
 //in the urlDatabase and then renders the urls_show
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const loginID = req.cookies["user_id"];
+  const loginID = req.session.user_id;
   const loginUser = users[loginID];
   const url = urlDatabase[id];
 
@@ -243,7 +241,7 @@ app.post("/register", (req, res) => {
   if (!email || !password) {
     return res.status(400).send("Invalid email or/and password");
   }
-  if (getUserByEmail(email)) {
+  if (getUserByEmail(email, users)) {
     return res.status(400).send("Email already exists");
   }
 
@@ -257,7 +255,7 @@ app.post("/register", (req, res) => {
   };
   users[user_id] = newUser;
 
-  res.cookie("user_id", user_id);
+  req.session.user_id = user_id;
   res.redirect("/urls");
 });
 
@@ -294,7 +292,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const currentUser = getUserByEmail(email);
+  const currentUser = getUserByEmail(email, users);
 
   if (!currentUser) {
     return res.status(403).send("Invalid email/password");
@@ -305,12 +303,12 @@ app.post("/login", (req, res) => {
   if (!passwordMatch) {
     return res.status(403).send("Invalid email/password");
   }
-  res.cookie("user_id", currentUser.id);
+  req.session.user_id = currentUser.id;
   res.redirect("/urls");
 });
 
 //---Logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session.user_id = null;
   res.redirect("/login");
 });
