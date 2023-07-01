@@ -1,6 +1,7 @@
 const cookieSession = require("cookie-session");
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const saltRounds = 10;
 const {
   getUserByEmail,
   urlsForUser,
@@ -42,17 +43,17 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: bcrypt.hashSync("purple-monkey-dinosaur", saltRounds),
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: bcrypt.hashSync("dishwasher-funk", saltRounds),
   },
   asdfg: {
     id: "asdfg",
     email: "asd@fg",
-    password: "kuma",
+    password: bcrypt.hashSync("kuma", saltRounds),
   },
 };
 
@@ -90,18 +91,28 @@ app.get("/urls", (req, res) => {
 
 //POST request to add a new URL with new short URL
 app.post("/urls", (req, res) => {
-  if (!users[req.session.user_id]) {
+  const loginID = req.session.user_id;
+  if (!users[loginID]) {
     return res.status(401).send("<h2>You must be logged in to TinyApp.</h2>");
   }
-  const id = generateRandomString();
-  const longURL = req.body.longURL;
-  urlDatabase[id] = longURL;
-  res.redirect(`/urls/${id}`);
+  const newShortURL = generateRandomString();
+
+  if(urlDatabase[newShortURL]) {
+    return res.send("<h2>Short URL already exists.</h2>")
+  }
+
+  urlDatabase[newShortURL] = {
+    longURL: req.body.longURL,
+    userID: loginID
+  }
+
+  console.log("URL", urlDatabase);
+  
+  res.redirect(`/urls/${newShortURL}`);
 });
 
 app.get("/urls/new", (req, res) => {
-  const loginID = req.session.user_id;
-  const loginUser = users[loginID];
+  const loginUser = users[req.session.user_id];
   const templateVars = {
     user: loginUser,
   };
@@ -208,14 +219,14 @@ app.post("/register", (req, res) => {
   const { email, password } = req.body; //accessing the data submitted in the req body
 
   if (!email || !password) {
-    return res.status(400).send("Invalid email or/and password");
+    return res.status(400).send("Invalid email and/or password");
   }
   if (getUserByEmail(email, users)) {
     return res.status(400).send("Email already exists");
   }
 
   const user_id = generateRandomString();
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  const hashedPassword = bcrypt.hashSync(password, saltRounds); //Salt rounds
 
   const newUser = {
     id: user_id,

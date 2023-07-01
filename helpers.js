@@ -6,7 +6,7 @@
 function getUserByEmail(email, database) {
   for (const user in database) {
     if (database[user].email === email) {
-      return users[user];
+      return database[user];
     }
   }
   return undefined;
@@ -21,7 +21,7 @@ function urlsForUser(id, urlDatabase) {
   const userURLs = {};
   for (const shortUrl in urlDatabase) {
     if (urlDatabase[shortUrl].userID === id) {
-      userURLs[id] = urlDatabase[shortUrl];
+      userURLs[shortUrl] = urlDatabase[shortUrl];
     }
   }
   return userURLs;
