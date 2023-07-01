@@ -1,6 +1,7 @@
 const cookieSession = require('cookie-session')
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const getUserByEmail = require("./helpers");
 const app = express();
 const PORT = 8080;
 
@@ -13,19 +14,6 @@ function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 }
 
-/**
- * Get user by Email from user database
- * @param {string} email
- * @returns user information object if found, otherwise undefined
- */
-function getUserByEmail(email, database) {
-  for (const user in users) {
-    if (users[user].email === email) {
-      return users[user];
-    }
-  }
-  return undefined;
-}
 
 /**
  * Only shows URLs that belong to the logged-in user from urlDatabase
