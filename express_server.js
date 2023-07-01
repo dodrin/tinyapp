@@ -204,6 +204,8 @@ app.post("/urls/:id/edit", (req, res) => {
     return res.send("<h2>You do not have permission to access this URL.</h2>");
   }
 
+  const newLongURL = req.body.longURL;
+  urlDatabase[id].longURL = newLongURL;
   res.redirect("/urls");
 });
 
