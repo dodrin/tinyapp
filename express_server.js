@@ -75,11 +75,10 @@ app.get("/urls", (req, res) => {
     user_id: loginID,
   };
 
-  // templateVars.urls = urlsForUser(loginID, urlDatabase);
   res.render("urls_index", templateVars);
 });
 
-//POST request to add a new URL with new short URL
+//POST request to add a new URL with newly generated short URL
 app.post("/urls", (req, res) => {
   const loginID = req.session.user_id;
 
@@ -144,6 +143,8 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//Post request to delete a url, needs to log in to use the page
+//can only delete urls that belong to the user
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   const loginID = req.session.user_id;
@@ -170,7 +171,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-//---Edit
+//Edit urls: Same as delete must log in and urls needs to belong to the user
 app.post("/urls/:id/edit", (req, res) => {
   const id = req.params.id;
   const loginID = req.session.user_id;
@@ -198,17 +199,17 @@ app.post("/urls/:id/edit", (req, res) => {
   res.redirect("/urls");
 });
 
+//path to redirect to actual long URL
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
 
   res.redirect(urlDatabase[id].longURL);
 });
 
-//email and password cannot be empty, alredy existing email cannot be registered
-//password will be stored after hashing using bcrypt
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
-
+  //email and password cannot be empty, alredy existing email cannot be registered
+  //password will be stored after hashing using bcrypt
   if (!email || !password) {
     return res.status(400).send("Invalid email and/or password");
   }
@@ -216,6 +217,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Email already exists");
   }
 
+  //Create a new user and add to database
   const user_id = generateRandomString();
   const hashedPassword = bcrypt.hashSync(password, saltRounds);
   const newUser = {
@@ -231,7 +233,6 @@ app.post("/register", (req, res) => {
 
 app.get("/register", (req, res) => {
   const loginUser = users[req.session.user_id];
-
   if (loginUser) {
     res.redirect("/urls");
   } else {

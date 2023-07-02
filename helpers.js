@@ -28,7 +28,7 @@ function urlsForUser(id, urlDatabase) {
 }
 
 /**
- * @Returns a string of 6 dondom alphanumeric characters
+ * @Returns a string of 6 random alphanumeric characters
  */
 function generateRandomString() {
   //36 represents base 36
