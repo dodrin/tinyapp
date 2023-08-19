@@ -46,16 +46,6 @@ const users = {
   },
 };
 
-//---Routes
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
-//Define route with express
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
 //list all the urls
 app.get("/urls", (req, res) => {
   const loginID = req.session.user_id;
@@ -172,7 +162,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 //Edit urls: Same as delete must log in and urls needs to belong to the user
-app.post("/urls/:id/edit", (req, res) => {
+app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const loginID = req.session.user_id;
   const loginUser = users[loginID];
@@ -268,4 +258,9 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   req.session.user_id = null;
   res.redirect("/login");
+});
+
+//---Routes
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
 });
